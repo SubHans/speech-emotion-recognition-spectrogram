@@ -1,0 +1,48 @@
+================================================================================
+                    DATASET DOWNLOAD SOURCES & INSTRUCTIONS
+================================================================================
+
+1. RAVDESS (Ryerson Audio-Visual Database of Emotional Speech and Song)
+--------------------------------------------------------------------------------
+Description : 1,440 audio speech files recorded by 24 professional actors 
+              (12 male, 12 female) expressing 8 emotions (neutral, calm, 
+              happy, sad, angry, fearful, disgust, surprised).
+
+Primary Link (Kaggle) : https://www.kaggle.com/datasets/uwrfkaggler/ravdess-emotional-speech-audio
+Official Source (Zenodo): https://zenodo.org/record/1188976
+
+Kaggle CLI Download Command:
+  kaggle datasets download -d uwrfkaggler/ravdess-emotional-speech-audio --unzip -p ./data/ravdess
+
+
+2. TESS (Toronto Emotional Speech Set)
+--------------------------------------------------------------------------------
+Description : 2,800 audio speech files recorded by 2 female speakers 
+              (aged 26 and 64) expressing 7 emotions (angry, disgust, fear, 
+              happy, neutral, pleasant surprise, sad).
+
+Primary Link (Kaggle) : https://www.kaggle.com/datasets/ejlok1/toronto-emotional-speech-set-tess
+Official Source (Dataverse): https://doi.org/10.5683/SP2/8OJB5B
+
+Kaggle CLI Download Command:
+  kaggle datasets download -d ejlok1/toronto-emotional-speech-set-tess --unzip -p ./data/tess
+
+
+================================================================================
+                   PYTHON DOWNLOAD CODE (FOR GOOGLE COLAB / JUPYTER)
+================================================================================
+
+# 1. Download RAVDESS Dataset via Kaggle API:
+!kaggle datasets download uwrfkaggler/ravdess-emotional-speech-audio
+
+# 2. Download TESS Dataset via Kaggle API:
+!kaggle datasets download ejlok1/toronto-emotional-speech-set-tess
+
+# Extract Zip Files:
+import zipfile
+
+with zipfile.ZipFile("ravdess-emotional-speech-audio.zip", 'r') as zip_ref:
+    zip_ref.extractall("./ravdess-emotional-speech-audio")
+
+with zipfile.ZipFile("toronto-emotional-speech-set-tess.zip", 'r') as zip_ref:
+    zip_ref.extractall("./toronto-emotional-speech-set-tess")
