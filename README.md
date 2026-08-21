@@ -41,6 +41,7 @@ This repository leverages **Mel-Spectrograms**—a 2D time-frequency representat
 - **Deep Feature Extractor**: Fine-tuned **EfficientNetB3** pre-trained on ImageNet for rich multi-scale spatial feature learning.
 - **Automated Hyperparameter Optimization**: Automated tuning of XGBoost hyperparameters (`n_estimators`, `learning_rate`, `max_depth`, `subsample`, `colsample_bytree`) powered by **Optuna**.
 - **Hybrid Classifier (EfficientNetB3 + XGBoost)**: Combining CNN spatial representations with Gradient Boosted Decision Trees (GBDT) for state-of-the-art accuracy.
+- **Modular Pipeline Architecture**: Clean modular Python package (`src/`) split stage-by-stage alongside full Jupyter Notebooks.
 - **Multi-Dataset Benchmarking**: Comprehensive evaluations conducted on both **RAVDESS** and **TESS** benchmark datasets.
 
 ---
@@ -56,12 +57,12 @@ flowchart TD
     C --> D["📐 Log Power-to-dB & Resize (300x300x3 RGB)"]
     D --> E["🧠 EfficientNetB3 Base Model"]
     
-    subgraph Feature Extraction & Fine-Tuning
+    subgraph Stage 1 & 2: Feature Extraction & Fine-Tuning
         E --> F["⚡ Fine-Tuning Top Layers (Adam Optimizer)"]
         F --> G["📥 Deep Feature Vector Extraction"]
     end
     
-    subgraph Optimization & Classification
+    subgraph Stage 3: Optimization & Classification
         G --> H["🔍 Optuna Hyperparameter Study"]
         H --> I["🌲 XGBoost Classifier Training"]
     end
@@ -72,6 +73,8 @@ flowchart TD
 ---
 
 ## 📊 Datasets
+
+Detailed download links and Kaggle API commands can be found in [`DATASETS.txt`](DATASETS.txt).
 
 ### 1. RAVDESS (Ryerson Audio-Visual Database of Emotional Speech and Song)
 - **Total Classes (8)**: `neutral`, `calm`, `happy`, `sad`, `angry`, `fearful`, `disgust`, `surprised`
@@ -104,11 +107,20 @@ The models were evaluated using **Accuracy**, **Weighted F1-Score**, and **Test 
 
 ```dir
 .
-├── Emotional_Rec_Base_RAVDES_Final.ipynb       # RAVDESS Baseline Model (EfficientNetB3)
-├── Emotional_Rec_RAVDES_Enhance_Final.ipynb    # RAVDESS Enhanced Model (EfficientNetB3 + Optuna + XGBoost)
-├── Emotional_Rec_Base_TESS_Final.ipynb         # TESS Baseline Model (EfficientNetB3)
-├── Emotional_Rec_TESS_Enhance_Final.ipynb      # TESS Enhanced Model (EfficientNetB3 + Optuna + XGBoost)
-└── README.md                                   # Documentation
+├── src/
+│   ├── __init__.py          # Python package initializer & exports
+│   ├── preprocessing.py     # Stage 1: Mel-Spectrogram extraction & dataset loaders
+│   ├── models.py            # Stage 2: EfficientNetB3 Transfer Learning & Optuna XGBoost
+│   └── utils.py             # Stage 3: Evaluation metrics & plot visualizers
+├── main.py                  # CLI Pipeline Runner script
+├── requirements.txt         # Package dependencies file
+├── DATASETS.txt             # Dataset download links & Kaggle CLI setup
+├── sourcecode/              # Original Jupyter Notebooks
+│   ├── Emotional_Rec_Base_RAVDES_Final.ipynb
+│   ├── Emotional_Rec_RAVDES_Enhance_Final.ipynb
+│   ├── Emotional_Rec_Base_TESS_Final.ipynb
+│   └── Emotional_Rec_TESS_Enhance_Final.ipynb
+└── README.md                # Documentation
 ```
 
 ---
@@ -121,34 +133,48 @@ The models were evaluated using **Accuracy**, **Weighted F1-Score**, and **Test 
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/Speech-Emotion-Recognition-Spectrogram.git
-cd Speech-Emotion-Recognition-Spectrogram
+git clone https://github.com/your-username/speech-emotion-recognition-spectrogram.git
+cd speech-emotion-recognition-spectrogram
 ```
 
 ### 2. Install Dependencies
-Install all required libraries using `pip`:
+Install all required packages using `requirements.txt`:
 
 ```bash
-pip install numpy pandas matplotlib seaborn librosa scikit-learn scikit-image tqdm tensorflow xgboost optuna
+pip install -r requirements.txt
 ```
 
 ---
 
 ## 🚀 How to Run
 
-1. **Launch Jupyter Notebook or Google Colab**:
-   Open any of the project notebook files (`.ipynb`) in Google Colab or your local Jupyter environment.
+### Option 1: Using the Modular CLI Script (`main.py`)
 
-2. **Dataset Setup**:
-   The notebooks include Kaggle API integration commands to download datasets directly:
-   - For RAVDESS: `!kaggle datasets download uwrfkaggler/ravdess-emotional-speech-audio`
-   - For TESS: `!kaggle datasets download ejlok1/toronto-emotional-speech-set-tess`
+You can run the end-to-end training and evaluation pipeline directly from your terminal:
 
-3. **Run Pipeline Cells sequentially**:
-   - Audio preprocessing & Spectrogram feature generation
-   - Deep Feature Extraction via EfficientNetB3
-   - Optuna study for hyperparameter tuning
-   - Final XGBoost training & evaluation report generation
+```bash
+# Run Enhanced Hybrid Model on RAVDESS Dataset:
+python main.py --dataset ravdess --data_path ./ravdess-emotional-speech-audio --mode enhanced --save_plots
+
+# Run Baseline Model on TESS Dataset:
+python main.py --dataset tess --data_path ./toronto-emotional-speech-set-tess --mode baseline
+```
+
+#### Command-Line Arguments:
+- `--dataset`: Choose dataset (`ravdess` or `tess`).
+- `--data_path`: Path to directory containing dataset `.wav` audio files.
+- `--mode`: Execution mode (`enhanced` for EfficientNetB3 + Optuna XGBoost or `baseline` for EfficientNetB3 Softmax).
+- `--epochs`: Training epochs for EfficientNetB3 fine-tuning (default: `20`).
+- `--n_trials`: Number of trials for Optuna hyperparameter optimization (default: `15`).
+- `--save_plots`: Flag to automatically save evaluation plots as PNG files.
+
+---
+
+### Option 2: Using Jupyter Notebooks (`.ipynb`)
+
+1. Open any notebook in `sourcecode/` using Jupyter Lab, VS Code, or Google Colab.
+2. Download datasets as instructed in [`DATASETS.txt`](DATASETS.txt).
+3. Execute notebook cells sequentially.
 
 ---
 
